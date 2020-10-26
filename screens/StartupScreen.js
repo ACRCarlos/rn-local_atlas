@@ -7,12 +7,12 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 const StartupScreen = (props) => {
   const nextScreenHandler = () => {
-    props.navigation.navigate("Select");
+    props.navigation.navigate("SignIn");
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#009387" barStyle="dark-content" />
+      <StatusBar backgroundColor="#1cd5c6" barStyle="dark-content" />
       <View style={styles.header}>
         <Animatable.Image
           animation="bounceIn"
@@ -24,7 +24,6 @@ const StartupScreen = (props) => {
       </View>
       <Animatable.View style={styles.footer} animation="fadeInUpBig">
         <Text style={styles.title}>Great local recommendations worldwide</Text>
-        <Text style={styles.text}>Choose your type</Text>
         <View style={styles.button}>
           <TouchableOpacity onPress={nextScreenHandler}>
             <LinearGradient
@@ -44,7 +43,7 @@ const StartupScreen = (props) => {
 StartupScreen.navigationOptions = {
   headerTitle: "Local Atlas",
   headerStyle: {
-    backgroundColor: "#009387",
+    backgroundColor: "#1cd5c6",
   },
   headerTitleStyle: {
     color: "#fff",
@@ -52,7 +51,7 @@ StartupScreen.navigationOptions = {
 };
 
 const { height } = Dimensions.get("screen");
-const height_logo = height * 0.28;
+const heightLogo = height * 0.28;
 
 const styles = StyleSheet.create({
   container: {
@@ -66,15 +65,15 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: 1,
-    backgroundColor: "#009387",
+    backgroundColor: "#1cd5c6",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingVertical: 50,
     paddingHorizontal: 30,
   },
   logo: {
-    width: height_logo,
-    height: height_logo,
+    width: heightLogo,
+    height: heightLogo,
   },
   title: {
     color: "#fff",
