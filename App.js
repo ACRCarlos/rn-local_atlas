@@ -1,31 +1,24 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { createStore, combineReducers } from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
+import thunk from "redux-thunk";
 
-// import authReducer from "./store/reducers/auth";
+import authReducer from "./store/reducers/auth";
 
 import AppNavigator from "./navigation/AppNavigator";
 
-// const rootReducer = combineReducers({
-//   auth: authReducer,
-// });
+const middleware = [thunk];
 
-// const store = createStore(rootReducer);
+const rootReducer = combineReducers({
+  auth: authReducer,
+});
+
+const store = createStore(rootReducer, applyMiddleware(...middleware));
 
 export default function App() {
   return (
-    // <Provider store={store}>
-    <AppNavigator />
-    // {/* </Provider> */}
+    <Provider store={store}>
+      <AppNavigator />
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
