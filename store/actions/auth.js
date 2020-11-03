@@ -37,6 +37,50 @@ export const authenticate = (userId, token, expiryTime) => {
   };
 };
 
+export const signUp = (username, email, password) => {
+  return async (dispatch) => {
+    const response = await fetch(
+      "https://nodejs-local-atlas.herokuapp.com/api/user/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email,
+          password: password,
+          returnSecureToken: true,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorResData = await response.json();
+      let message = errorResData.errors[0].msg;
+      throw new Error(message);
+    }
+
+    const resData = await response.json();
+
+    console.log(resData);
+
+    dispatch(
+      authenticate(
+        resData.localId,
+        resData.idToken,
+        parseInt(resData.expiresIn) * 1000
+      )
+    );
+
+    const expirationDate = new Date(
+      new Date().getTime() + parseInt(resData.expiresIn) * 1000
+    );
+
+    saveDataToStorage(resData.idToken, resData.localId, expirationDate);
+  };
+};
+
 export const signIn = (email, password) => {
   return async (dispatch) => {
     const response = await fetch(
@@ -53,6 +97,12 @@ export const signIn = (email, password) => {
         }),
       }
     );
+
+    if (!response.ok) {
+      const errorResData = await response.json();
+      let message = errorResData.errors[0].msg;
+      throw new Error(message);
+    }
 
     const resData = await response.json();
 

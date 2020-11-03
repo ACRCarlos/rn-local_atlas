@@ -1,36 +1,157 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   TouchableOpacity,
   StyleSheet,
   View,
   Text,
-  Button,
-  Dimensions,
-  TextInput,
   StatusBar,
   ScrollView,
   Platform,
+  Alert,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { LinearGradient } from "expo-linear-gradient";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Feather from "react-native-vector-icons/Feather";
+
+import Input from "../../components/UI/Input";
+
+import * as authActions from "../../store/actions/auth";
+
+const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
+
+const formReducer = (state, action) => {
+  if (action.type === FORM_INPUT_UPDATE) {
+    const updatedValues = {
+      ...state.inputValues,
+      [action.input]: action.value,
+    };
+    const updatedValidities = {
+      ...state.inputValidities,
+      [action.input]: action.isValid,
+    };
+    let updatedFormIsValid = true;
+    for (const key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
+    }
+    return {
+      formIsValid: updatedFormIsValid,
+      inputValidities: updatedValidities,
+      inputValues: updatedValues,
+    };
+  }
+  return state;
+};
 
 const SignUpScreen = (props) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+
+  const dispatch = useDispatch();
+
+  const [formState, dispatchFormState] = useReducer(formReducer, {
+    inputValues: {
+      username: "",
+      email: "",
+      password: "",
+    },
+    inputValidities: {
+      username: false,
+      email: false,
+      password: false,
+    },
+    formIsValid: false,
+  });
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert("An Error Ocurred!", error, [{ text: "Okay" }]);
+    }
+  });
+
   const goToSignInHandler = () => {
     props.navigation.navigate("SignIn");
+  };
+
+  const inputChangeHandler = useCallback(
+    (inputIdentifier, inputValue, inputValidity) => {
+      dispatchFormState({
+        type: FORM_INPUT_UPDATE,
+        value: inputValue,
+        isValid: inputValidity,
+        input: inputIdentifier,
+      });
+    },
+    [dispatchFormState]
+  );
+
+  const signUpHandler = async () => {
+    let action;
+    action = authActions.signUp(
+      formState.inputValues.username,
+      formState.inputValues.email,
+      formState.inputValues.password
+    );
+
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await dispatch(action);
+      props.navigation.navigate("SignIn");
+    } catch (err) {
+      setError(err.message);
+      setIsLoading(false);
+    }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#1cd5c6" barStyle="dark-content" />
+
       <View style={styles.header}>
         <Text style={styles.textHeader}>Register Now!</Text>
       </View>
+
       <Animatable.View animation="fadeInUpBig" style={styles.footer}>
         <ScrollView>
+          <View>
+            <Input
+              id="username"
+              placeholder="Your Username"
+              keyboardType="default"
+              required
+              minLength={5}
+              errorText="Please enter a User name"
+              onInputChange={inputChangeHandler}
+              initialValue=""
+            />
+            <Input
+              id="email"
+              placeholder="Your Email"
+              keyboardType="email-address"
+              required
+              email
+              autoCapitalize="none"
+              errorText="Please enter a valid email address"
+              onInputChange={inputChangeHandler}
+              initialValue=""
+            />
+            <Input
+              id="password"
+              placeholder="Your Password"
+              keyboardType="default"
+              secureTextEntry
+              required
+              minLength={5}
+              autoCapitalize="none"
+              errorText="Please enter a valid password"
+              onInputChange={inputChangeHandler}
+              initialValue=""
+            />
+          </View>
+
           <View style={styles.button}>
-            <TouchableOpacity style={styles.signIn} onPress={()=>{}}>
+            <TouchableOpacity style={styles.signIn} onPress={signUpHandler}>
               <LinearGradient
                 colors={["#08d4c4", "#01ab9d"]}
                 style={styles.signIn}
@@ -40,6 +161,7 @@ const SignUpScreen = (props) => {
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[
                 styles.signIn,

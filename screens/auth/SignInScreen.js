@@ -46,6 +46,7 @@ const formReducer = (state, action) => {
 const SignInScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+  
   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
