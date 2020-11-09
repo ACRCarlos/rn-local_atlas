@@ -1,18 +1,62 @@
-import React from "react";
-import { Dimensions, StyleSheet, View, StatusBar, Text } from "react-native";
+import React, { useEffect } from "react";
+import {
+  Dimensions,
+  StyleSheet,
+  View,
+  StatusBar,
+  Text,
+  ActivityIndicator,
+  AsyncStorage,
+} from "react-native";
+import { useDispatch } from "react-redux";
 import * as Animatable from "react-native-animatable";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+import Colors from "../constants/Colors";
+
+import * as authActions from "../store/actions/auth";
+
 const StartupScreen = (props) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const tryLogin = async () => {
+      const userData = await AsyncStorage.getItem("userData");
+
+      if (!userData) {
+        props.navigation.navigate("SignIn");
+        return;
+      }
+
+      const transformedData = JSON.stringify(userData);
+      console.log(transformedData);
+      const { token, userId, expiryDate } = transformedData;
+      const expirationDate = new Date(expiryDate);
+
+      if (expirationDate <= new Date() || !token || !userId) {
+        props.navigation.navigate("SignIn");
+        return;
+      }
+
+      const expirationTime = expirationTime.getTime() - new Date().getTime();
+
+      props.navigation.navigate("Home");
+      dispatch(authActions.authenticate(userId, token, expirationTime));
+    };
+
+    tryLogin();
+  }, [dispatch]);
+
   const nextScreenHandler = () => {
     props.navigation.navigate("SignIn");
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#1cd5c6" barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.primary} barStyle="dark-content" />
+      {/* <ActivityIndicator size="large" color={Colors.primary} /> */}
       <View style={styles.header}>
         <Animatable.Image
           animation="bounceIn"
@@ -43,7 +87,7 @@ const StartupScreen = (props) => {
 StartupScreen.navigationOptions = {
   headerTitle: "Local Atlas",
   headerStyle: {
-    backgroundColor: "#1cd5c6",
+    backgroundColor: { color: Colors.primary },
   },
   headerTitleStyle: {
     color: "#fff",

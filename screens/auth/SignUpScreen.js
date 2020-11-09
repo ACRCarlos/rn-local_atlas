@@ -9,13 +9,16 @@ import {
   ScrollView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { LinearGradient } from "expo-linear-gradient";
 
+import * as authActions from "../../store/actions/auth";
+
 import Input from "../../components/UI/Input";
 
-import * as authActions from "../../store/actions/auth";
+import Colors from "../../constants/Colors";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -66,7 +69,7 @@ const SignUpScreen = (props) => {
     if (error) {
       Alert.alert("An Error Ocurred!", error, [{ text: "Okay" }]);
     }
-  });
+  }, [error]);
 
   const goToSignInHandler = () => {
     props.navigation.navigate("SignIn");
@@ -106,7 +109,7 @@ const SignUpScreen = (props) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#1cd5c6" barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.primary} barStyle="dark-content" />
 
       <View style={styles.header}>
         <Text style={styles.textHeader}>Register Now!</Text>
@@ -150,30 +153,40 @@ const SignUpScreen = (props) => {
             />
           </View>
 
-          <View style={styles.button}>
-            <TouchableOpacity style={styles.signIn} onPress={signUpHandler}>
-              <LinearGradient
-                colors={["#08d4c4", "#01ab9d"]}
-                style={styles.signIn}
-              >
-                <Text style={[styles.textSign, { color: "#fff" }]}>
-                  Sign Up
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+          {isLoading ? (
+            <View style={styles.button}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+          ) : (
+            <View style={styles.button}>
+              <TouchableOpacity style={styles.signIn} onPress={signUpHandler}>
+                <LinearGradient
+                  colors={[Colors.primary, "#01ab9d"]}
+                  style={styles.signIn}
+                >
+                  <Text style={[styles.textSign, { color: "#fff" }]}>
+                    Sign Up
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.signIn,
-                { borderColor: "#1cd5c6", borderWidth: 1, marginTop: 15 },
-              ]}
-              onPress={goToSignInHandler}
-            >
-              <Text style={[styles.textSign, { color: "#1cd5c6" }]}>
-                Sign In
-              </Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                style={[
+                  styles.signIn,
+                  {
+                    borderColor: Colors.primary,
+                    borderWidth: 1,
+                    marginTop: 15,
+                  },
+                ]}
+                onPress={goToSignInHandler}
+              >
+                <Text style={[styles.textSign, { color: Colors.primary }]}>
+                  Sign In
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
       </Animatable.View>
     </View>
@@ -183,7 +196,7 @@ const SignUpScreen = (props) => {
 SignUpScreen.navigationOptions = {
   headerTitle: "Sign Up",
   headerStyle: {
-    backgroundColor: "#1cd5c6",
+    backgroundColor: Colors.primary,
   },
   headerTitleStyle: {
     color: "#fff",
@@ -193,7 +206,7 @@ SignUpScreen.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1cd5c6",
+    backgroundColor: Colors.primary,
   },
   header: {
     flex: 1,
@@ -215,7 +228,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   textFooter: {
-    color: "#05375a",
+    color: Colors.secondary,
     fontSize: 18,
   },
   action: {

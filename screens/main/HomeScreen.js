@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 
 import * as authActions from "../../store/actions/auth";
 
+import Colors from "../../constants/Colors";
+
 const MainScreen = (props) => {
   const dispatch = useDispatch();
   return (
@@ -23,7 +25,7 @@ const MainScreen = (props) => {
 MainScreen.navigationOptions = {
   headerTitle: "Home",
   headerStyle: {
-    backgroundColor: "#1cd5c6",
+    backgroundColor: Colors.primary,
   },
   headerTitleStyle: {
     color: "#fff",
